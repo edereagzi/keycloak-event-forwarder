@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  template:
+    spec:
+      containers:
+        - name: keycloak
+          env:
+            - name: KEF_SINK_TYPE
+              value: "HTTP"
+            - name: KEF_ENDPOINT_URL
+              value: "https://your-webhook.example/events"
+            - name: KEF_AUTH_HEADER_NAME
+              value: "X-Webhook-Secret"
+            - name: KEF_AUTH_HEADER_VALUE
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-event-forwarder
+                  key: webhook-secret
+            - name: KEF_SEND_USER_EVENTS
+              value: "true"
+            - name: KEF_SEND_ADMIN_EVENTS
+              value: "true"
+            - name: KEF_INCLUDE_EVENTS
+              value: "LOGIN,LOGIN_ERROR,REGISTER,UPDATE_PASSWORD"
+            - name: KEF_INCLUDE_ADMIN_OPERATIONS
+              value: "CREATE,UPDATE,DELETE,ACTION"
+            - name: KEF_QUEUE_CAPACITY
+              value: "20000"
+            - name: KEF_WORKER_THREADS
+              value: "2"

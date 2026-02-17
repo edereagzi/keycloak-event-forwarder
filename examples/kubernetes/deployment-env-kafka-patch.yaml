@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+spec:
+  template:
+    spec:
+      containers:
+        - name: keycloak
+          env:
+            - name: KEF_SINK_TYPE
+              value: "KAFKA"
+            - name: KEF_KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-1:9092,kafka-2:9092,kafka-3:9092"
+            - name: KEF_KAFKA_TOPIC
+              value: "security.keycloak.events"
+            - name: KEF_KAFKA_ACKS
+              value: "all"
+            - name: KEF_KAFKA_ENABLE_IDEMPOTENCE
+              value: "true"
+            - name: KEF_SEND_USER_EVENTS
+              value: "true"
+            - name: KEF_SEND_ADMIN_EVENTS
+              value: "true"
+            - name: KEF_INCLUDE_EVENTS
+              value: "LOGIN,LOGIN_ERROR,REGISTER,UPDATE_PASSWORD"
+            - name: KEF_INCLUDE_ADMIN_OPERATIONS
+              value: "CREATE,UPDATE,DELETE,ACTION"
+            - name: KEF_QUEUE_CAPACITY
+              value: "50000"
+            - name: KEF_WORKER_THREADS
+              value: "4"
