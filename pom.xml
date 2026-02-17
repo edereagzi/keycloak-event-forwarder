@@ -5,7 +5,7 @@
 
   <groupId>com.github.edereagzi</groupId>
   <artifactId>keycloak-event-forwarder</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
   <name>keycloak-event-forwarder</name>
   <description>Production-ready Keycloak event listener SPI that forwards user and admin events to HTTP webhooks and Kafka topics with async non-blocking dispatch.</description>
   <url>https://github.com/edereagzi/keycloak-event-forwarder</url>
