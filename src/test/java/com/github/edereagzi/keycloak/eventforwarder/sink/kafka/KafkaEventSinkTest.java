@@ -44,4 +44,5 @@ class KafkaEventSinkTest {
             });
     return ForwarderConfig.from(scope);
   }
+
 }

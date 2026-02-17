@@ -53,6 +53,21 @@ class ForwarderConfigTest {
     assertEquals(0, config.httpMaxRetries);
   }
 
+  @Test
+  void parsesKafkaExtraProperties() {
+    Config.Scope scope =
+        scope(
+            Map.of(
+                "kafka-extra-properties",
+                "request.timeout.ms=15000,retries=10,max.block.ms=5000"));
+
+    ForwarderConfig config = ForwarderConfig.from(scope);
+
+    assertEquals("15000", config.kafkaExtraProperties.get("request.timeout.ms"));
+    assertEquals("10", config.kafkaExtraProperties.get("retries"));
+    assertEquals("5000", config.kafkaExtraProperties.get("max.block.ms"));
+  }
+
   private static Config.Scope scope(Map<String, String> values) {
     Config.Scope scope = mock(Config.Scope.class);
     when(scope.get(anyString()))

@@ -3,7 +3,9 @@ package com.github.edereagzi.keycloak.eventforwarder.config;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.jboss.logging.Logger;
@@ -54,6 +56,7 @@ public final class ForwarderConfig {
   public final String kafkaSecurityProtocol;
   public final String kafkaSaslMechanism;
   public final String kafkaSaslJaasConfig;
+  public final Map<String, String> kafkaExtraProperties;
 
   private ForwarderConfig(
       SinkType sinkType,
@@ -85,7 +88,8 @@ public final class ForwarderConfig {
       boolean kafkaEnableIdempotence,
       String kafkaSecurityProtocol,
       String kafkaSaslMechanism,
-      String kafkaSaslJaasConfig) {
+      String kafkaSaslJaasConfig,
+      Map<String, String> kafkaExtraProperties) {
     this.sinkType = sinkType;
     this.sendUserEvents = sendUserEvents;
     this.sendAdminEvents = sendAdminEvents;
@@ -116,6 +120,7 @@ public final class ForwarderConfig {
     this.kafkaSecurityProtocol = kafkaSecurityProtocol;
     this.kafkaSaslMechanism = kafkaSaslMechanism;
     this.kafkaSaslJaasConfig = kafkaSaslJaasConfig;
+    this.kafkaExtraProperties = kafkaExtraProperties;
   }
 
   public static ForwarderConfig from(Config.Scope scope) {
@@ -170,6 +175,9 @@ public final class ForwarderConfig {
         value(scope, "kafka-security-protocol", "KEF_KAFKA_SECURITY_PROTOCOL", "");
     String kafkaSaslMechanism = value(scope, "kafka-sasl-mechanism", "KEF_KAFKA_SASL_MECHANISM", "");
     String kafkaSaslJaasConfig = value(scope, "kafka-sasl-jaas-config", "KEF_KAFKA_SASL_JAAS_CONFIG", "");
+    Map<String, String> kafkaExtraProperties =
+        parseKeyValuePairs(
+            value(scope, "kafka-extra-properties", "KEF_KAFKA_EXTRA_PROPERTIES", ""));
 
     return new ForwarderConfig(
         sinkType,
@@ -201,7 +209,8 @@ public final class ForwarderConfig {
         kafkaEnableIdempotence,
         kafkaSecurityProtocol,
         kafkaSaslMechanism,
-        kafkaSaslJaasConfig);
+        kafkaSaslJaasConfig,
+        kafkaExtraProperties);
   }
 
   public boolean hasHttpSink() {
@@ -295,5 +304,35 @@ public final class ForwarderConfig {
         .filter(s -> !s.isBlank())
         .map(s -> s.toUpperCase(Locale.ROOT))
         .collect(Collectors.toSet());
+  }
+
+  private static Map<String, String> parseKeyValuePairs(String raw) {
+    if (raw == null || raw.isBlank()) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, String> values = new LinkedHashMap<>();
+    for (String token : raw.split(",")) {
+      String pair = token.trim();
+      if (pair.isBlank()) {
+        continue;
+      }
+
+      int splitAt = pair.indexOf('=');
+      if (splitAt <= 0 || splitAt == pair.length() - 1) {
+        LOG.warnf("Ignoring invalid KEF_KAFKA_EXTRA_PROPERTIES item '%s'", pair);
+        continue;
+      }
+
+      String key = pair.substring(0, splitAt).trim();
+      String value = pair.substring(splitAt + 1).trim();
+      if (key.isBlank() || value.isBlank()) {
+        LOG.warnf("Ignoring invalid KEF_KAFKA_EXTRA_PROPERTIES item '%s'", pair);
+        continue;
+      }
+      values.put(key, value);
+    }
+
+    return values;
   }
 }

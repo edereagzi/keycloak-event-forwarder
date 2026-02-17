@@ -149,6 +149,13 @@ HTTP retry behavior:
 | `KEF_KAFKA_SECURITY_PROTOCOL` | _empty_ | Optional security protocol |
 | `KEF_KAFKA_SASL_MECHANISM` | _empty_ | Optional SASL mechanism |
 | `KEF_KAFKA_SASL_JAAS_CONFIG` | _empty_ | Optional SASL JAAS config |
+| `KEF_KAFKA_EXTRA_PROPERTIES` | _empty_ | Extra Kafka producer properties in `key=value,key2=value2` format |
+
+Example:
+
+```bash
+KEF_KAFKA_EXTRA_PROPERTIES=request.timeout.ms=15000,retries=10,max.block.ms=5000
+```
 
 ## Recommended Presets
 

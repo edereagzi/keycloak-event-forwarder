@@ -72,6 +72,7 @@ public final class KafkaEventSink implements EventSink {
     if (config.kafkaSaslJaasConfig != null && !config.kafkaSaslJaasConfig.isBlank()) {
       properties.put("sasl.jaas.config", config.kafkaSaslJaasConfig);
     }
+    properties.putAll(config.kafkaExtraProperties);
 
     LOG.infov("Kafka sink configured for topic {0}", config.kafkaTopic);
     return properties;
